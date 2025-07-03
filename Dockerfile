@@ -1,5 +1,5 @@
 # Start from the code-server Debian base image
-FROM lscr.io/linuxserver/code-server:latest
+FROM codercom/code-server:4.101.2-39
 
 USER coder
 

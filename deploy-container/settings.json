@@ -3,5 +3,11 @@
   "git.postCommitCommand": "sync",
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
-  "git.autofetch": true
+  "git.autofetch": true,
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "workbench.panel.defaultLocation": "bottom",
+  "workbench.startupEditor": "none",
+  "workbench.sideBar.location": "left",
+  "workbench.activityBar.visible": true,
+  "workbench.tips.enabled": false
 }
