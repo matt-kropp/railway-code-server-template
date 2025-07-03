@@ -9,12 +9,38 @@ COPY deploy-container/settings.json .local/share/code-server/User/settings.json
 # Use bash shell
 ENV SHELL=/bin/bash
 
-# Install unzip + rclone (support for remote filesystem)
-RUN sudo apt-get update
+# Install basic packages first (including unzip for rclone)
+RUN sudo dnf update -y && sudo dnf install -y \
+gcc \
+gcc-c++ \
+make \
+curl \
+wget \
+git \
+vim \
+nano \
+htop \
+tree \
+jq \
+unzip \
+python3 \
+python3-pip \
+python3-devel \
+&& sudo dnf clean all
+
+# Install rclone (now that unzip is available)
 RUN curl https://rclone.org/install.sh | sudo bash
 
 # Copy rclone tasks to /tmp, to potentially be used
 COPY deploy-container/rclone-tasks.json /tmp/rclone-tasks.json
+
+# Create symbolic links for easier usage
+RUN sudo ln -sf /usr/bin/python3 /usr/bin/python
+RUN sudo ln -sf /usr/bin/pip3 /usr/bin/pip
+
+# Install Node.js and npm (using NodeSource repository for latest LTS)
+RUN curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash -
+RUN sudo dnf install -y nodejs npm
 
 # Fix permissions for code-server
 RUN sudo chown -R coder:coder /home/coder/.local
@@ -26,31 +52,6 @@ RUN sudo chown -R coder:coder /home/coder/.local
 # Note: we use a different marketplace than VS Code. See https://github.com/cdr/code-server/blob/main/docs/FAQ.md#differences-compared-to-vs-code
 RUN code-server --install-extension esbenp.prettier-vscode
 RUN code-server --install-extension saoudrizwan.claude-dev
-
-# Install apt packages:
-# Install Python and pip
-RUN sudo apt-get install -y python3 python3-pip python3-venv python3-dev python3-full
-
-# Create symbolic links for easier usage
-RUN sudo ln -sf /usr/bin/python3 /usr/bin/python
-RUN sudo ln -sf /usr/bin/pip3 /usr/bin/pip
-
-# Install Node.js and npm (using NodeSource repository for latest LTS)
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-RUN sudo apt-get install -y nodejs
-
-# Install common development tools
-RUN sudo apt-get install -y \
-build-essential \
-curl \
-wget \
-git \
-vim \
-nano \
-htop \
-tree \
-jq \
-unzip
 
 # Install global npm packages that are commonly used
 RUN sudo npm install -g \
